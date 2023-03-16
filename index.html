@@ -30,7 +30,7 @@
             ><img src="././assets/Heriot_Watt_Logo.png" alt="heriottwatt_logo"
           /></a>
         </li>
-        <a href="./index_home.html"><li class="nav__listitem">Home</li></a>
+        <a href="#"><li class="nav__listitem">Home</li></a>
        
         <li class="nav__listitem">
           Links
@@ -46,13 +46,11 @@
     </nav>
 
     <div class="graph-container">
-      <!-- <div class="exercise_card_container" id="lab2_header"> -->
         <div class="title_container" style="background-color: white">
           <div class="dashboard_title" style="color: #0b4183">
             CourseWork 1 - Covid - 19 Dashboard
           </div>
         </div>
-      <!-- </div> -->
     </div>
     <div class="graph-container">
       <div>
@@ -64,23 +62,25 @@
       <div>
         <span id="bubble_chart"></span>
         <span id="line_chart_1"></span>
-        <span id="line_chart_2"></span>
       </div>
 
       <div>
+        <span class="stacked-line-title"></span>
         <span id="stacked_line"></span>
+        </div>
+        <div>
         <button
-        onclick="createStackedLineChart('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv', ['total_cases','total_vaccinations','total_deaths','total_boosters'], 'China')"
+        onclick="createStackedChart('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv', ['total_cases','total_vaccinations','total_deaths','total_boosters'], 'China')"
       >
         China
       </button>
       <button
-        onclick="createStackedLineChart('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv', ['total_cases','total_vaccinations','total_deaths','total_boosters'], 'United States')"
+        onclick="createStackedChart('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv', ['total_cases','total_vaccinations','total_deaths','total_boosters'], 'United States')"
       >
         United States
       </button>
       <button
-        onclick="createStackedLineChart('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv', ['total_cases','total_vaccinations','total_deaths','total_boosters'], 'Italy')"
+        onclick="createStackedChart('https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv', ['total_cases','total_vaccinations','total_deaths','total_boosters'], 'Italy')"
       >
         Italy
       </button>
@@ -133,7 +133,8 @@
         .attr("x", width / 2 - 100)
         .attr("y", 15)
         .style("fill", "red")
-        .text("New Cases");
+        .text("New Cases")
+        .style("font-weight","bold");
 
       svg
         .append("rect")
@@ -149,6 +150,7 @@
         .attr("x", width / 2 - 160)
         .attr("y", 40)
         .style("fill", "red")
+        .style("font-weight","bold")
         .text("**Click on Country");
       // Map and projection
       const path = d3.geoPath();
@@ -216,11 +218,24 @@
             location_sel = d.properties.name;
             console.log("location_sel", location_sel);
             property = "total_cases";
-            span_title="#line_chart"
+            span_title="#line_chart";
+            property1 = "total_deaths";
+            span_title1="#line_chart_1";
+            property_stacked = "total_deaths";
+            span_title_stacked="#line_chart_1";
+            property_list = [
+                "total_cases",
+                "total_vaccinations",
+                "total_deaths",
+                "total_boosters",
+            ];
 
             csv_loc =
             "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv";
             createLineChart(csv_loc,  location_sel,property,span_title);
+            createLineChart(csv_loc,  location_sel,property1,span_title1);
+            createStackedChart(csv_loc, property_list, location_sel);
+
           };
           let mouseLeave = function (d) {
             d3.selectAll(".Country")
@@ -271,12 +286,10 @@
     property = "new_cases";
     element_Id = "map";
     createMap(csv_loc, property, element_Id);
-    
-    
-
 
      
-    ////////////////////////START SINGLE LINE CHART///
+    ////////////////////////START SINGLE LINE CHART////////
+    
 
     function createLineChart(csv_path, country, property,span_title) {
         debugger;
@@ -333,7 +346,8 @@
             .attr("x", 200)
             .attr("y", -10)
             .style("fill", "red")
-            .text(country + " : " + property + " per day");
+            .text(country + " : " + property + " per day")
+            .style("font-weight","bold");;
 
           x.domain(
             d3.extent(data, function (d) {
@@ -451,6 +465,7 @@
         .attr("x", 230)
         .attr("y", 15)
         .style("fill", "red")
+        .style("font-weight","bold")
         .text("GDP PER CAPITA");
       svg
         .append("rect")
@@ -465,7 +480,8 @@
         .attr("x", 190)
         .attr("y", 40)
         .style("fill", "red")
-        .text("**Click to View");
+        .text("**Click to View")
+        .style("font-weight","bold");
 
       // Read data
       groupDataByLocation(csv_path, property).then(function (data) {
@@ -513,6 +529,19 @@
           d3.select(span_id).selectAll(".line_1").remove();
           d3.select(span_id).selectAll(".line_2").remove();
           createLineChart(csv_path, d.key, property, span_id, color_name);
+          property = "total_cases";
+          span_title="#line_chart";
+          property_list = [
+                "total_cases",
+                "total_vaccinations",
+                "total_deaths",
+                "total_boosters",
+            ];
+
+            csv_loc =
+            "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv";
+            createLineChart(csv_loc,  d.key,property,span_title);
+            createStackedChart(csv_loc, property_list, d.key);
         };
 
         // Initialize the circle: all located at the center of the svg area
@@ -598,14 +627,249 @@
     span_id = "#bubble_chart_4";
     g_title = "GDP Per Capita Per Country";
     createBubbleChart(csv_path, property, span_id, g_title);
+
+    location_sel = "United Arab Emirates";
+    console.log("location_sel", location_sel);
+    property = "total_deaths";
+    span_title="#line_chart_1"
+
+    csv_loc =
+            "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv";
+    createLineChart(csv_loc,  location_sel,property,span_title);
       //////////////////////////BUBBLE CHART CREATED///////////////////////////////////////
 
       //////////////////////////CREATE STACKED LINE FOR CORRELATION///////////////////////
-      const margin = { top: 60, right: 230, bottom: 50, left: 100 },
-    width = 1500 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+      function createStackedChart(csv_loc, property_list, location_sel) {
+        filterDatabyProperties(
+        csv_loc,
+        property_list,
+        location_sel
+      ).then(function (data) {
+        //d3.csv(
+        //  "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv"
+        //).then(function (data) {
+        //////////
+        // GENERAL //
+        //////////
 
-  // Initialize the plot with the first dataset
+        if(location_sel!='United Arab Emirates'){
+
+            property = "total_cases";
+            span_title="#line_chart";
+            property1 = "total_deaths";
+            span_title1="#line_chart_1";
+            property_stacked = "total_deaths";
+            span_title_stacked="#line_chart_1";
+            property_list = [
+                "total_cases",
+                "total_vaccinations",
+                "total_deaths",
+                "total_boosters",
+            ];
+
+            csv_loc =
+            "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv";
+            createLineChart(csv_loc,  location_sel,property,span_title);
+            createLineChart(csv_loc,  location_sel,property1,span_title1);
+        }
+
+        svgStack
+          .select(".stack_chart_title")
+          .text(location_sel + " Cases and Deaths Trend");
+        x.domain(
+          d3.extent(data, function (d) {
+            return d.date;
+          })
+        );
+
+        xAxis.call(d3.axisBottom(x).ticks(5));
+
+        var max = 0;
+        property_list.forEach(function (property, i) {
+          var max_y = d3.max(data, function (d) {
+            return d[property];
+          });
+          console.log("max prop: ", property, " ", max_y);
+          if (max < max_y) {
+            max = max_y;
+          }
+        });
+
+        console.log("max y", max);
+
+        y.domain([0, +max]);
+        yAxis.call(d3.axisLeft(y).ticks(5));
+
+        // List of groups = header of the csv files
+        const keys = property_list;
+
+        // color palette
+        const color = d3.scaleOrdinal().domain(keys).range(d3.schemeSet2);
+
+        //stack the data?
+        const stackedData = d3.stack().keys(keys)(data);
+        console.log("stackedData", stackedData);
+
+        //////////
+        // AXIS //
+        //////////
+
+        //////////
+        // BRUSHING AND CHART //
+        //////////
+
+        // Add a clipPath: everything out of this area won't be drawn.
+        const clipStack = svgStack
+          .append("defs")
+          .append("svg:clipPath")
+          .attr("id", "clipStack")
+          .append("svg:rect")
+          .attr("width", widthStack)
+          .attr("height", height + 5)
+          .attr("x", 0)
+          .attr("y", -5);
+
+        // Add brushing
+        const brush = d3
+          .brushX() // Add the brush feature using the d3.brush function
+          .extent([
+            [0, -5],
+            [widthStack, height + 5],
+          ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
+          .on("end", updateChart); // Each time the brush selection changes, trigger the 'updateChart' function
+
+        // Create the scatter variable: where both the circles and the brush take place
+        const areaChart = svgStack
+          .append("g")
+          .attr("clip-path", "url(#clipStack)");
+
+        // Area generator
+        const area = d3
+          .area()
+          .x(function (d) {
+            //console.log("date", d.data.date);
+            return x(d.data.date);
+          })
+          .y0(function (d) {
+            //console.log("d[0]", d[0]);
+            return y(d[0]);
+          })
+          .y1(function (d) {
+            //console.log("d[1]", d[1]);
+            return y(d[1]);
+          });
+
+        svgStack.selectAll(".myArea").remove();
+
+        // Show the areasremove
+        areaChart
+          .selectAll("mylayers")
+          .data(stackedData)
+          .join("path")
+          .attr("class", function (d) {
+            return "myArea " + d.key;
+          })
+          .style("fill", function (d) {
+            return color(d.key);
+          })
+          .attr("d", area);
+
+        // Add the brushing
+        areaChart.append("g").attr("class", "brush").call(brush);
+
+        let idleTimeout;
+        function idled() {
+          idleTimeout = null;
+        }
+
+        // A function that update the chart for given boundaries
+        function updateChart(event, d) {
+          extent = event.selection;
+
+          // If no selection, back to initial coordinate. Otherwise, update X axis domain
+          if (!extent) {
+            if (!idleTimeout) return (idleTimeout = setTimeout(idled, 350)); // This allows to wait a little bit
+            x.domain(
+              d3.extent(data, function (d) {
+                return d.date;
+              })
+            );
+          } else {
+            x.domain([x.invert(extent[0]), x.invert(extent[1])]);
+            areaChart.select(".brush").call(brush.move, null); // This remove the grey brush area as soon as the selection has been done
+          }
+
+          // Update axis and area position
+          xAxis.transition().duration(1000).call(d3.axisBottom(x).ticks(5));
+          areaChart
+            .selectAll("path")
+            .transition()
+            .duration(1000)
+            .attr("d", area);
+        }
+
+        //////////
+        // HIGHLIGHT GROUP //
+        //////////
+
+        // What to do when one group is hovered
+        const highlight = function (event, d) {
+          // reduce opacity of all groups
+          d3.selectAll(".myArea").style("opacity", 0.1);
+          // expect the one that is hovered
+          d3.select("." + d).style("opacity", 1);
+        };
+
+        // And when it is not hovered anymore
+        const noHighlight = function (event, d) {
+          d3.selectAll(".myArea").style("opacity", 1);
+        };
+
+        //////////
+        // LEGEND //
+        //////////
+
+        // Add one dot in the legend for each name.
+        const size = 20;
+        svgStack
+          .selectAll("myrect")
+          .data(keys)
+          .join("rect")
+          .attr("x", 0)
+          .attr("y", function (d, i) {
+            return height + 40 + i * (size + 5);
+          }) // 100 is where the first dot appears. 25 is the distance between dots
+          .attr("width", size)
+          .attr("height", size)
+          .style("fill", function (d) {
+            return color(d);
+          })
+          .on("mouseover", highlight)
+          .on("mouseleave", noHighlight);
+
+        // Add one dot in the legend for each name.
+        svgStack
+          .selectAll("mylabels")
+          .data(keys)
+          .join("text")
+          .attr("x", 0 + size * 1.2)
+          .attr("y", function (d, i) {
+            return height + 40 + i * (size + 5) + size / 2;
+          }) // 100 is where the first dot appears. 25 is the distance between dots
+          .style("fill", function (d) {
+            return color(d);
+          })
+          .text(function (d) {
+            return d;
+          })
+          .attr("text-anchor", "left")
+          .style("alignment-baseline", "middle")
+          .on("mouseover", highlight)
+          .on("mouseleave", noHighlight);
+      });
+    }
+
+     // Initialize the plot with the first dataset
   location_sel = "United Arab Emirates";
   //property_list = ['new_cases','total_deaths','people_fully_vaccinated_per_hundred']
   property_list = [
@@ -616,250 +880,86 @@
   ];
 
   csv_loc =
-    "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv";
+  "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv";;
 
-  // Add X axis
+     const margin = { top: 30, right: 30, bottom: 70, left: 60 };
+    // const width = 1225 - margin.left - margin.right;
+    // const height1 = 200 - margin.top - margin.bottom;
+    // const height2 = 400 - margin.top - margin.bottom;
+    const marginSTack = { top: 60, right: 230, bottom: 50, left: 100 },
+      width = 1400 - marginSTack.left - margin.right;
+      widthStack = 1350 - marginSTack.left - marginSTack.right,
+      height = 400 - marginSTack.top - marginSTack.bottom;
 
-  // append the svg object to the body of the page
-  const svg = d3
-    .select("#stacked_line")
-    .append("svg")
-    .attr("width", width + margin.right)
-    .attr("height", height * 2 + margin.top + margin.bottom)
-    .style("border", "solid")
-    .style("border-width", "5px")
-    .style("border-radius", "10px")
-    .style("background-color", "white")
-    .style("padding", "5px")
-    .style("border-color", "white")
-    .append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    // Add X axis
 
-  const x = d3.scaleTime().range([0, width]);
-  const y = d3.scaleLinear().range([height, 0]);
-  const xAxis = svg.append("g").attr("transform", `translate(0, ${height})`);
-  const yAxis = svg.append("g");
+    // append the svg object to the body of the page
+    const svgStack = d3
+      .select("#stacked_line")
+      .append("svg")
+      .style("background-color", "white")
+      .attr("width", widthStack + marginSTack.right)
+      .attr("height", height * 2 - 100 + marginSTack.top + marginSTack.bottom)
+      .style("border", "solid")
+      .style("border-width", "5px")
+      .style("border-radius", "10px")
+      .style("padding", "5px")
+      .style("border-color", "white")
+      .append("g")
+      .attr("transform", `translate(${marginSTack.left}, ${marginSTack.top})`);
 
-  // Add X axis label:
-  svg
-    .append("text")
-    .attr("text-anchor", "end")
-    .attr("x", width)
-    .attr("y", height + 40)
-    .text("Time (year)");
+    const x = d3.scaleTime().range([0, widthStack]);
+    const y = d3.scaleLinear().range([height, 0]);
+    const xAxis = svgStack
+      .append("g")
+      .attr("transform", `translate(0, ${height})`);
+    const yAxis = svgStack.append("g");
 
-  // Add Y axis label:
-  svg
-    .append("text")
-    .attr("text-anchor", "end")
-    .attr("x", 0)
-    .attr("y", -20)
-    .text("Stats Evolution")
-    .attr("text-anchor", "start");
-    // Parse the Data
-  function createStackedLineChart(csv_loc, property_list, location_sel) {
-    filterDatabyProperties(
-      csv_loc,
-      property_list,
-      location_sel
-    ).then(function (data) {
-      //d3.csv(
-      //  "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/5_OneCatSevNumOrdered_wide.csv"
-      //).then(function (data) {
-      //////////
-      // GENERAL //
-      //////////
-      
-      x.domain(
-        d3.extent(data, function (d) {
-          return d.date;
-        })
-      );
+    // Add X axis label:
+    svgStack
+      .append("text")
+      .attr("text-anchor", "end")
+      .attr("x", widthStack)
+      .attr("y", height + 40)
+      .text("Time (year)");
 
-      xAxis.call(d3.axisBottom(x).ticks(5));
+    // Add Y axis label:
 
-      var max = 0;
-      property_list.forEach(function (property, i) {
-        var max_y = d3.max(data, function (d) {
-          return d[property];
-        });
-        console.log("max prop: ", property, " ", max_y);
-        if (max < max_y) {
-          max = max_y;
-        }
-      });
+    svgStack
+      .append("rect")
+      .attr("width", width - 100)
+      .attr("height", 20)
+      .attr("x", 0)
+      .attr("y", -60)
+      .attr("fill", "white");
 
-      console.log("max y", max);
+    svgStack
+      .append("text")
+      .attr("class", "stack_chart_title")
+      .attr("x", width / 2 - 100)
+      .attr("y", -45)
+      .style("fill", "red")
+      .style("font-weight", "bold")
+      .text(location_sel + " Correlation b/w Vaccination, Booster, Total cases");
 
-      y.domain([0, +max]);
-      yAxis.call(d3.axisLeft(y).ticks(5));
+    svgStack
+      .append("rect")
+      .attr("width", 300)
+      .attr("height", 20)
+      .attr("x", width / 2 - 160)
+      .attr("y", -35)
+      .attr("fill", "white");
 
-      // List of groups = header of the csv files
-      const keys = property_list;
+    svgStack
+      .append("text")
+      .attr("class", "brush_to_zoom_stack")
+      .attr("x", width / 2 - 55)
+      .attr("y", -20)
+      .style("fill", "red")
+      .style("font-weight", "bold")
+      .text("Brush To Zoom");
 
-      // color palette
-      const color = d3.scaleOrdinal().domain(keys).range(d3.schemePastel1);
-
-      //stack the data?
-      const stackedData = d3.stack().keys(keys)(data);
-      console.log("stackedData", stackedData);
-
-      //////////
-      // AXIS //
-      //////////
-
-      //////////
-      // BRUSHING AND CHART //
-      //////////
-
-      // Add a clipPath: everything out of this area won't be drawn.
-      const clip = svg
-        .append("defs")
-        .append("svg:clipPath")
-        .attr("id", "clip")
-        .append("svg:rect")
-        .attr("width", width)
-        .attr("height", height + 5)
-        .attr("x", 0)
-        .attr("y", -5);
-
-      // Add brushing
-      const brush = d3
-        .brushX() // Add the brush feature using the d3.brush function
-        .extent([
-          [0, -5],
-          [width, height + 5],
-        ]) // initialise the brush area: start at 0,0 and finishes at width,height: it means I select the whole graph area
-        .on("end", updateChart); // Each time the brush selection changes, trigger the 'updateChart' function
-
-      // Create the scatter variable: where both the circles and the brush take place
-      const areaChart = svg.append("g").attr("clip-path", "url(#clip)");
-
-      // Area generator
-      const area = d3
-        .area()
-        .x(function (d) {
-          //console.log("date", d.data.date);
-          return x(d.data.date);
-        })
-        .y0(function (d) {
-          //console.log("d[0]", d[0]);
-          return y(d[0]);
-        })
-        .y1(function (d) {
-          //console.log("d[1]", d[1]);
-          return y(d[1]);
-        });
-
-      svg.selectAll(".myArea").remove();
-
-      // Show the areasremove
-      areaChart
-        .selectAll("mylayers")
-        .data(stackedData)
-        .join("path")
-        .attr("class", function (d) {
-          return "myArea " + d.key;
-        })
-        .style("fill", function (d) {
-          return color(d.key);
-        })
-        .attr("d", area);
-
-      // Add the brushing
-      areaChart.append("g").attr("class", "brush").call(brush);
-
-      let idleTimeout;
-      function idled() {
-        idleTimeout = null;
-      }
-
-      // A function that update the chart for given boundaries
-      function updateChart(event, d) {
-        extent = event.selection;
-
-        // If no selection, back to initial coordinate. Otherwise, update X axis domain
-        if (!extent) {
-          if (!idleTimeout) return (idleTimeout = setTimeout(idled, 350)); // This allows to wait a little bit
-          x.domain(
-            d3.extent(data, function (d) {
-              return d.date;
-            })
-          );
-        } else {
-          x.domain([x.invert(extent[0]), x.invert(extent[1])]);
-          areaChart.select(".brush").call(brush.move, null); // This remove the grey brush area as soon as the selection has been done
-        }
-
-        // Update axis and area position
-        xAxis.transition().duration(1000).call(d3.axisBottom(x).ticks(5));
-        areaChart.selectAll("path").transition().duration(1000).attr("d", area);
-      }
-
-      //////////
-      // HIGHLIGHT GROUP //
-      //////////
-
-      // What to do when one group is hovered
-      const highlight = function (event, d) {
-        // reduce opacity of all groups
-        d3.selectAll(".myArea").style("opacity", 0.1);
-        // expect the one that is hovered
-        d3.select("." + d).style("opacity", 1);
-      };
-
-      // And when it is not hovered anymore
-      const noHighlight = function (event, d) {
-        d3.selectAll(".myArea").style("opacity", 1);
-      };
-
-      //////////
-      // LEGEND //
-      //////////
-
-      // Add one dot in the legend for each name.
-      const size = 20;
-      svg
-        .selectAll("myrect")
-        .data(keys)
-        .join("rect")
-        .attr("x", 0)
-        .attr("y", function (d, i) {
-          return height + 40 + i * (size + 5);
-        }) // 100 is where the first dot appears. 25 is the distance between dots
-        .attr("width", size)
-        .attr("height", size)
-        .style("fill", function (d) {
-          return color(d);
-        })
-        .on("mouseover", highlight)
-        .on("mouseleave", noHighlight);
-
-      // Add one dot in the legend for each name.
-      svg
-        .selectAll("mylabels")
-        .data(keys)
-        .join("text")
-        .attr("x", 0 + size * 1.2)
-        .attr("y", function (d, i) {
-          return height + 40 + i * (size + 5) + size / 2;
-        }) // 100 is where the first dot appears. 25 is the distance between dots
-        .style("fill", function (d) {
-          return color(d);
-        })
-        .text(function (d) {
-          return d;
-        })
-        .attr("text-anchor", "left")
-        .style("alignment-baseline", "middle")
-        .on("mouseover", highlight)
-        .on("mouseleave", noHighlight);
-    });
-  }
-  createStackedLineChart(csv_loc, property_list, location_sel);
-     
-
-
+    createStackedChart(csv_loc, property_list, location_sel);
      //////////////////////////CREATE STACKED LINE FOR CORRELATION///////////////////////
 
 
